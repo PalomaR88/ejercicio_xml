@@ -4,9 +4,15 @@ doc= etree.parse('xml_muertes.xml')
 
 #función para opción 1
 def lista_causas(doc):
-    log=True
-    for x in doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA/MUNICIPIOS/MUNICIPIO/CAUSAS_CCV/CAUSA_CCV/DESC_CAUSA_CCV/text()"):
-        lista=x
+    lista=[]
+    causas=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA/MUNICIPIOS/MUNICIPIO/CAUSAS_CCV/CAUSA_CCV/DESC_CAUSA_CCV/text()")
+    for i in range(len(causas)):
+        existe=False
+        for x in range(len(lista)):
+            if causas[i]==lista[x]:
+                existe=True
+        if existe==False:
+            lista.append(causas[i])
     return lista
 
 #menu principal
@@ -20,8 +26,8 @@ while True:
     opcion=input("Opción: ")
     print("")
     if opcion=="1":
-        for causa in lista_causas(doc):
-            print(causa)
+        print(lista_causas(doc))
+            #print(causa[50])
         print("")
     elif opcion=="2":
         print("")
