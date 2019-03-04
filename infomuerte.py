@@ -1,11 +1,12 @@
 #importar xml
 from lxml import etree
-doc= etree.parse('xml muertes.xml')
+doc= etree.parse('xml_muertes.xml')
 
 #función para opción 1
 def lista_causas(doc):
-    lista=doc.xpath('//FALLECIDOS_MUNICIPIOS/text()')
-    #lista=doc.xpath('/MORTALIDAD/PROVINCIAS/PROVINCIA/MUNICIPIOS/CAUSAS_CCV/CAUSA_CCV/DESC_CAUSA_CCV/text()')
+    log=True
+    for x in doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA/MUNICIPIOS/MUNICIPIO/CAUSAS_CCV/CAUSA_CCV/DESC_CAUSA_CCV/text()"):
+        lista=x
     return lista
 
 #menu principal
