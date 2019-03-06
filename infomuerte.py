@@ -42,12 +42,16 @@ def buscar_causa(doc, numero):
 
 #funcion para opción 2(segunda parte)
 def sumar(doc, numero):
-    x=[]
-    causa=crear_lista(doc)[numero]
-    suma=doc.xpath("/MORATLIDAD/PROVINCIAS/PROVINCIA/MUNICIPIOS/MUNICIPIO/CAUSAS_CCV/CAUSA_CCV[/DESC_CAUSA_CCV/text()='%s']/GENEROS/GENERO/FALLECIDOS_GENERO/text()" %(causa))
-    for i in suma:
-        x.append(i)    
-    return x
+    resultado=[]
+    causa=lista_causas(doc)[numero]
+    dato=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA/MUNICIPIOS/MUNICIPIO/CAUSAS_CCV/CAUSA_CCV[DESC_CAUSA_CCV='%s']/FALLECIDOS_CAUSA_CCV/text()" %(causa))
+    for i in dato:
+        x=i.strip()
+        n_suma=int(x)
+        #x=i.strip
+        #n_suma=int(i).strip
+        resultado.append(n_suma)    
+    return sum(resultado)
 
     #suma=doc.xpath("/MORATLIDAD/PROVINCIAS/PROVINCIA/MUNICIPIOS/MUNICIPIO/CAUSAS_CCV/CAUSA_CCV[DESC_CAUSA_CCV='%s']/GENEROS/GENERO/FALLECIDOS_GENERO/text()"%(causa))
     #return suma
@@ -67,14 +71,20 @@ while True:
     print("")
     if opcion=="1":
         for i in range(len(crear_lista(doc))):
-            print(i, "-", crear_lista(doc)[i])
+            print(i, "-", crear_lista(doc)[i])        
         print("")
+
     elif opcion=="2":
         numero=int(input("Introduce el número que corresponde a la causa (opción 1): "))
-        print("")
-        print(buscar_causa(doc, numero))
-        print("")
-        print(sumar(doc, numero))
+        print(" ")
+        print("Causa: ", buscar_causa(doc, numero))
+        print("Resultado: ", sumar(doc, numero))
+        
+        
+    #    "Resultado de fallecidos por:")
+    #    print(buscar_causa(doc, numero)) 
+    #    print("        ->", sumar(doc, numero))
+        print(" ")
 
     elif opcion=="3":
         print("")
