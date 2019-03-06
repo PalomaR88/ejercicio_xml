@@ -53,8 +53,90 @@ def sumar(doc, numero):
         resultado.append(n_suma)    
     return sum(resultado)
 
-    #suma=doc.xpath("/MORATLIDAD/PROVINCIAS/PROVINCIA/MUNICIPIOS/MUNICIPIO/CAUSAS_CCV/CAUSA_CCV[DESC_CAUSA_CCV='%s']/GENEROS/GENERO/FALLECIDOS_GENERO/text()"%(causa))
-    #return suma
+#función opción 3 (primera parte)
+def provincias(doc):
+    provincias=[]
+    prov=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA/DESC_PROVINCIA/text()")
+    for i in prov:
+        i=str(i).strip()
+        while 'Ã\x93' in i:
+            i=i.replace('Ã\x93','Ó')
+        while 'Ã\x8d' in i:
+            i=i.replace('Ã\x8d','Í')  
+        while 'Ã\x81' in i:
+            i=i.replace('Ã\x81','Á')
+        while 'Ã\x9a' in i:
+            i=i.replace('Ã\x9a','Ú')
+        while 'Ã\x89' in i:
+            i=i.replace('Ã\x89','É')
+        while 'Ã\x91' in i:
+            i=i.replace('Ã\x91','Ñ')
+        provincias.append(i)
+    return provincias
+
+#función opción 3 (segunda parte)
+def muertes_provincias(doc, numero):
+    provincias=[]
+    prov=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA/DESC_PROVINCIA/text()")
+    for i in prov:
+        i=str(i)
+        provincias.append(i)
+    provincia=provincias[numero]
+    return provincia
+
+#función opción 3 (tercera parte)
+def municipios(doc,numero):
+    municipios=[]
+    prov=muertes_provincias(doc, numero)
+    mun=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA[DESC_PROVINCIA='%s']/MUNICIPIOS/MUNICIPIO/DESC_MUNICIPIO/text()" %(prov))
+    for i in mun:
+        i=str(i).strip()
+        while 'Ã\x93' in i:
+           i=i.replace('Ã\x93','Ó')
+        while 'Ã\x8d' in i:
+            i=i.replace('Ã\x8d','Í')  
+        while 'Ã\x81' in i:
+            i=i.replace('Ã\x81','Á')
+        while 'Ã\x9a' in i:
+            i=i.replace('Ã\x9a','Ú')
+        while 'Ã\x89' in i:
+            i=i.replace('Ã\x89','É')
+        while 'Ã\x91' in i:
+            i=i.replace('Ã\x91','Ñ')
+        municipios.append(i)
+    return municipios
+
+
+#función opción 4 (cuarta parte)
+def muertes_mun(doc, numero, num_mun):
+    municipios=[]
+    muertes=[]
+    prov=muertes_provincias(doc, numero)
+    mun=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA[DESC_PROVINCIA='%s']/MUNICIPIOS/MUNICIPIO/DESC_MUNICIPIO/text()" %(prov))
+    for i in mun:
+        i=str(i)
+        municipios.append(i)
+    municipio=municipios[num_mun]
+    dato=doc.xpath("//MUNICIPIO[DESC_MUNICIPIO='%s']/FALLECIDOS_MUNICIPIO/text()" %municipio)
+    return dato[0].strip()
+
+
+
+    #provincias=[]
+    #prov=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA/DESC_PROVINCIA/text()")
+    #for i in prov:
+    #    i=str(i)
+    #    provincias.append(i)
+    #provincia=provincias[numero]
+    #return provincia
+
+    #dato=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA[DESC_PROVINCIA='%s']/MUNICIPIOS/MUNICIPIO[DESC_MUNICIPIO=" %(prov))
+    #for i in dato:
+    return municipio
+
+
+
+
 
 
 
@@ -63,7 +145,7 @@ def sumar(doc, numero):
 while True:
     print('''1.- Listar todas las causas mortales
 2.- Contar las muertes por una causa concreta
-3.- Filtrar muertes por provincia
+3.- Filtrar muertes por municipio
 4.- Filtrar causas por edad y género
 5.- Comparar provincias por causas
 0.- Salir''')
@@ -79,14 +161,21 @@ while True:
         print(" ")
         print("Causa: ", buscar_causa(doc, numero))
         print("Resultado: ", sumar(doc, numero))
-        
-        
-    #    "Resultado de fallecidos por:")
-    #    print(buscar_causa(doc, numero)) 
-    #    print("        ->", sumar(doc, numero))
         print(" ")
 
     elif opcion=="3":
+        print("")
+        print("Provincias disponibles: ")
+        for i in range(len(provincias(doc))):
+            print(i, "-", provincias(doc)[i])
+        numero=int(input("Introduce el número que corresponde a la provincia: "))
+        print("")
+        print("Municipios disponibles: ")
+        for i in range(len(municipios(doc, numero))):
+            print(i, "-", municipios(doc, numero)[i])
+        num_mun=int(input("Introcuduce el número que corresponde al municipio: "))
+        print("Resultado ->",muertes_mun(doc, numero, num_mun))
+        
         print("")
 
     elif opcion=="4":
