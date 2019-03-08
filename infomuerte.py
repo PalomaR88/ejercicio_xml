@@ -32,13 +32,19 @@ def opcion1(doc):
 def lista_causas(doc):
     lista=[]
     causas=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA/MUNICIPIOS/MUNICIPIO/CAUSAS_CCV/CAUSA_CCV/DESC_CAUSA_CCV/text()")
-    for i in range(len(causas)):
+    for i in lista_sin_repetir(causas):
+        lista.append(i)
+    return lista
+
+def lista_sin_repetir(dat_xp):
+    lista=[]
+    for i in range(len(dat_xp)):
         existe=False
         for x in range(len(lista)):
-            if causas[i]==lista[x]:
+            if dat_xp[i]==lista[x]:
                 existe=True
         if existe==False:
-            lista.append(causas[i])
+            lista.append(dat_xp[i])
     return lista
 
 #funcion que convalida, introduce el máx y devuelve una nueva opcion
@@ -133,8 +139,90 @@ def muertes_mun(doc, numero, num_mun):
     dato=doc.xpath("//MUNICIPIO[DESC_MUNICIPIO='%s']/FALLECIDOS_MUNICIPIO/text()" %municipio)
     return dato[0]
 
-#función que con la edad y el genero devuelve todas las muertes y 
-def edad_genero(doc, edad, genero):
+#función que con la edad y el genero y la provincia devuelve 
+# todas las muertes
+def edad_genero(doc, edad, genero, numero):
+    listag=[]
+    prov=lista_prov(doc)[numero]
+    causas=lista_causas(doc)
+    causas_imp=imprimir_por_pantalla(causas)
+    gen=eleccion_gen(doc,genero)
+    rango_edad=eleccion_edad(doc,edad)
+    for i in range(len(causas)):
+        listap=[]
+        muertes=doc.xpath("/MORTALIDAD/PROVINCIAS/PROVINCIA[DESC_PROVINCIA='%s']/MUNICIPIOS/MUNICIPIO/CAUSAS_CCV/CAUSA_CCV[DESC_CAUSA_CCV='%s']/GENEROS/GENERO[COD_GENERO='%s']/EDADES/EDAD[RANGO='%s']/NUM_FALLECIDOS/text()"%(prov,causas[i],gen,rango_edad))
+        for x in muertes:
+            m_imp=int(x.strip())
+            if m_imp>0:
+                listap.append(causas_imp[i].strip())
+                listap.append(m_imp)
+                listag.append(listap)
+    return listag
+
+#con una letra por teclado devuelve la correspondencia del
+#genero en la tabla
+def eleccion_gen(doc,genero):
+    gen=[]
+    dato_genero=doc.xpath("//CAUSAS_CCV/CAUSA_CCV/GENEROS/GENERO/COD_GENERO/text()")
+    for i in lista_sin_repetir(dato_genero):
+        if i.strip()==genero.upper():
+            gen.append(i)
+    return gen[0]
+
+#funcion que con una edad devuelve el rango en el xml
+def eleccion_edad(doc,edad):
+    lista=[]
+    lista_edad=[]
+    muertes=doc.xpath("//CAUSAS_CCV/CAUSA_CCV/GENEROS/GENERO/EDADES/EDAD/RANGO/text()")
+    for i in lista_sin_repetir(muertes):
+        n=i.strip()
+        if n=='> 84':
+            if edad>84:
+                lista_edad.append(i)
+        elif n=='0':
+            if edad==0:
+                lista_edad.append(i)
+        elif n!='< 84' and n!='0':
+            n1=int(n[0:2])
+            n2=int(n[5:7])
+            if edad>=n1 and edad<n2:
+                lista_edad.append(i)
+    return lista_edad[0]
+
+#función base para el punto 5
+def opcion5(doc,n1, mun1, n2, mun2):
+    lista=[]
+    m1=lista_municipios(doc,n1)[mun1]
+    m2=lista_municipios(doc,n2)[mun2]
+    datos=comp_mun(doc,m1,m2)
+    #for i in datos:
+    #    lista.append(i)
+    return datos
+    
+#funcion para recuperar los datos de ambos municipios
+def comp_mun(doc,m1,m2):
+    listag=[]
+    causas=lista_causas(doc)
+    causas_imp=imprimir_por_pantalla(causas)
+    for i in range(len(causas)):
+        lista=[]
+        muertes_causas1=doc.xpath("//MUNICIPIO[DESC_MUNICIPIO='%s']/CAUSAS_CCV/CAUSA_CCV[DESC_CAUSA_CCV='%s']/FALLECIDOS_CAUSA_CCV/text()"%(m1,causas[i]))
+        lista.append(causas_imp[i])
+        for x in muertes_causas1:
+            muertes_m1=muertes_causas1[0]
+        muertes_causas2=doc.xpath("//MUNICIPIO[DESC_MUNICIPIO='%s']/CAUSAS_CCV/CAUSA_CCV[DESC_CAUSA_CCV='%s']/FALLECIDOS_CAUSA_CCV/text()"%(m2,causas[i]))      
+        for x in muertes_causas2:
+            muertes_m2=muertes_causas2[0]
+        numero1=int(muertes_m1.strip())
+        numero2=int(muertes_m2.strip()) 
+        lista.append(numero1)
+        lista.append(numero2)
+        listag.append(lista)
+    return listag
+
+  
+
+
 
 
 
@@ -192,7 +280,7 @@ while True:
             print(i, "-", lista_provincias_imp(doc)[i])
         numero=convalidar("a la provincia: ",len(lista_provincias_imp(doc)))    
         print(" ")     
-        for i in edad_genero(doc, edad, genero):
+        for i in edad_genero(doc, edad, genero,numero):
             for x in range(len(i)):
                 if x/2==0:
                     print("Enfermedad ->", i[x])
@@ -201,35 +289,33 @@ while True:
                     print("")
         print("")
         tecla= input("PRESIONA UNA INTRO PARA CONTINUAR")
-#
-#    elif opcion=="5":
-#        for i in range(len(provincias(doc))):
-#            print(i, "-", provincias(doc)[i])
-#        numero=int(input("Introduce el número que corresponde a la provincia: "))
-#        print("")
-#        print("Municipios disponibles: ")
-#        for i in range(len(municipios(doc, numero))):
-#            print(i, "-", municipios(doc, numero)[i])
-#        mun1=int(input("Introcuduce el número que corresponde al primer municipio: "))
-#        for i in range(len(provincias(doc))):
-#            print(i, "-", provincias(doc)[i])
-#        numero=int(input("Introduce el número que corresponde a la provincia: "))
-#        print("")
-#        print("Municipios disponibles: ")
-#        for i in range(len(municipios(doc, numero))):
-#            print(i, "-", municipios(doc, numero)[i])
-#        mun2=int(input("Introcuduce el número que corresponde al segundo municipio: "))
-#       
-#        print(comparacion(doc,mun1,mun2))        
-#
-#
-#        print("")
-#        tecla= input("PRESIONA UNA INTRO PARA CONTINUAR")
-#
+
+    elif opcion=="5":
+        for i in range(len(lista_provincias_imp(doc))):
+            print(i, "-", lista_provincias_imp(doc)[i])
+        n1=convalidar("a la primera provincia: ",len(lista_provincias_imp(doc)))
+        for i in range(len(lista_municipios_imp(doc, n1))):
+            print(i, "-", lista_municipios_imp(doc, n1)[i])
+        mun1=convalidar("al municipio: ",len(lista_municipios_imp(doc,n1)))
+        
+        
+        for i in range(len(lista_provincias_imp(doc))):
+            print(i, "-", lista_provincias_imp(doc)[i])
+        n2=convalidar("a la segunda provincia: ",len(lista_provincias_imp(doc)))
+        for i in range(len(lista_municipios_imp(doc, n2))):
+            print(i, "-", lista_municipios_imp(doc, n2)[i])
+        mun2=convalidar("al municipio: ",len(lista_municipios_imp(doc,n2)))
+        municipio1=lista_municipios_imp(doc,n1)[mun1]
+        municipio2=lista_municipios_imp(doc,n2)[mun2]
+        for i in opcion5(doc,n1, mun1, n2, mun2):
+            for x in opcion5(doc,n1, mun1, n2, mun2):
+                print("Causa ->",x[0])
+                print("         ",municipio1,"->",x[1])
+                print("         ",municipio2,"->",x[2])
+             
     elif opcion=="0":
         print("Adios")
         break
     else:
         print("Lo siento, no hay ninguna opción disponible")
         print(" ")
-        tecla= input("PRESIONA UNA INTRO PARA CONTINUAR")
