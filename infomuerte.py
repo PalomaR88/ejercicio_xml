@@ -36,6 +36,8 @@ def lista_causas(doc):
         lista.append(i)
     return lista
 
+#función que introduces una lista y la devuelve sin
+#valores repetidos
 def lista_sin_repetir(dat_xp):
     lista=[]
     for i in range(len(dat_xp)):
@@ -219,11 +221,6 @@ def comp_mun(doc,m1,m2):
         lista.append(numero2)
         listag.append(lista)
     return listag
-
-  
-
-
-
 
 
 #menu principal
