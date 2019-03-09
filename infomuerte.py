@@ -53,8 +53,8 @@ def lista_sin_repetir(dat_xp):
 def convalidar(dato, num_max):
     while True:
         numero=int(input("Introduce el número que corresponde %s" %(dato)))
-        if numero>num_max:
-            print("ERROR. El número debe ser entre 0  y", num_max)
+        if numero>(num_max):
+            print("ERROR. El número debe ser entre 0  y", (num_max))
         else:
             break
     return numero
@@ -197,8 +197,6 @@ def opcion5(doc,n1, mun1, n2, mun2):
     m1=lista_municipios(doc,n1)[mun1]
     m2=lista_municipios(doc,n2)[mun2]
     datos=comp_mun(doc,m1,m2)
-    #for i in datos:
-    #    lista.append(i)
     return datos
     
 #funcion para recuperar los datos de ambos municipios
@@ -253,12 +251,14 @@ while True:
         print("Provincias disponibles: ")
         for i in range(len(lista_provincias_imp(doc))):
             print(i, "-", lista_provincias_imp(doc)[i])
-        numero=convalidar("a la provincia: ",len(lista_provincias_imp(doc)))
+        nume=(len(lista_provincias_imp(doc))-1)
+        numero=convalidar("a la provincia: ",nume)
         print("")
         print("Municipios disponibles: ")
         for i in range(len(lista_municipios_imp(doc, numero))):
             print(i, "-", lista_municipios_imp(doc, numero)[i])
-        num_mun=convalidar("al municipio: ",len(lista_municipios_imp(doc,numero)))
+        nume2=(len(lista_municipios_imp(doc,numero))-1)
+        num_mun=convalidar("al municipio: ",nume2)
         print("Resultado ->",muertes_mun(doc, numero, num_mun).strip())
         print("")
         tecla= input("PRESIONA UNA INTRO PARA CONTINUAR")
@@ -275,11 +275,11 @@ while True:
         print("Provincias disponibles: ")
         for i in range(len(lista_provincias_imp(doc))):
             print(i, "-", lista_provincias_imp(doc)[i])
-        numero=convalidar("a la provincia: ",len(lista_provincias_imp(doc)))    
+        numero=convalidar("a la provincia: ",len(lista_provincias_imp(doc))-1)    
         print(" ")     
         for i in edad_genero(doc, edad, genero,numero):
             for x in range(len(i)):
-                if x/2==0:
+                if x%2==0:
                     print("Enfermedad ->", i[x])
                 else:
                     print("Fallecidos ->", i[x])
@@ -290,18 +290,18 @@ while True:
     elif opcion=="5":
         for i in range(len(lista_provincias_imp(doc))):
             print(i, "-", lista_provincias_imp(doc)[i])
-        n1=convalidar("a la primera provincia: ",len(lista_provincias_imp(doc)))
+        n1=convalidar("a la primera provincia: ",len(lista_provincias_imp(doc))-1)
         for i in range(len(lista_municipios_imp(doc, n1))):
             print(i, "-", lista_municipios_imp(doc, n1)[i])
-        mun1=convalidar("al municipio: ",len(lista_municipios_imp(doc,n1)))
+        mun1=convalidar("al municipio: ",len(lista_municipios_imp(doc,n1))-1)
         
         
         for i in range(len(lista_provincias_imp(doc))):
             print(i, "-", lista_provincias_imp(doc)[i])
-        n2=convalidar("a la segunda provincia: ",len(lista_provincias_imp(doc)))
+        n2=convalidar("a la segunda provincia: ",len(lista_provincias_imp(doc))-1)
         for i in range(len(lista_municipios_imp(doc, n2))):
             print(i, "-", lista_municipios_imp(doc, n2)[i])
-        mun2=convalidar("al municipio: ",len(lista_municipios_imp(doc,n2)))
+        mun2=convalidar("al municipio: ",len(lista_municipios_imp(doc,n2))-1)
         municipio1=lista_municipios_imp(doc,n1)[mun1]
         municipio2=lista_municipios_imp(doc,n2)[mun2]
         for i in opcion5(doc,n1, mun1, n2, mun2):
